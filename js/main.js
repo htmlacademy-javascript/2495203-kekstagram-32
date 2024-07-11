@@ -1,2 +1,2 @@
-import { generatePhotosArray } from './data.js';
+import { generatePhotosArray } from './mock-data.js';
 generatePhotosArray();
