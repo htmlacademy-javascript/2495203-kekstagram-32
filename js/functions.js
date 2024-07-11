@@ -30,3 +30,18 @@ const extractDigits = (testData) => {
 extractDigits('1 кефир, 0.5 батона');
 extractDigits('а я томат');
 extractDigits('0.15  томат');
+
+const checkMeetingBoundaries = (workDayStartTime, workDayEndTime, meetingStartTime, meetingDuration) => {
+  const timePoints = [workDayStartTime, workDayEndTime, meetingStartTime].map((timeOClock) => {
+    const [hoursOClock, minutesOClock] = timeOClock.split(':');
+    return Number(hoursOClock) * 60 + Number(minutesOClock);
+  });
+  const [workDayLowerBoundary, workDayUpperBoundary, meetingLowerBoundary] = timePoints;
+  const meetingUpperBoundary = meetingLowerBoundary + meetingDuration;
+  return (workDayLowerBoundary <= meetingLowerBoundary && workDayUpperBoundary >= meetingUpperBoundary);
+};
+checkMeetingBoundaries('08:00', '17:30', '14:00', 90);
+checkMeetingBoundaries('8:0', '10:0', '8:0', 120);
+checkMeetingBoundaries('08:00', '14:30', '14:00', 90);
+checkMeetingBoundaries('14:00', '17:30', '08:0', 90);
+checkMeetingBoundaries('8:01', '17:30', '08:00', 90);
