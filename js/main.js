@@ -1,2 +1,2 @@
-import { generatePhotosArray } from './mock-data.js';
-generatePhotosArray();
+import { renderPhotoMiniatures } from './photo-miniatures.js';
+renderPhotoMiniatures();
