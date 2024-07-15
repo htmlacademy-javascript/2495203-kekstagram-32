@@ -1,2 +1,2 @@
-import { renderPhotoMiniatures } from './photo-miniatures.js';
-renderPhotoMiniatures();
+import { photosDataArray, renderPhotoMiniatures } from './photo-miniatures.js';
+renderPhotoMiniatures(photosDataArray);
