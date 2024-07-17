@@ -60,11 +60,10 @@ const onMiniatureClick = (evt) => {
   commentsTotalCountElement.textContent = comments.length;
   captionElement.textContent = description;
   renderComments(comments);
+  toggleBigPicture();
 
   bigPictureCloseButton.addEventListener('click', onCrossClick);
   document.addEventListener('keydown', onDocumentKeyDown);
-  bigPictureCloseButton.addEventListener('click', onCrossClick);
-  toggleBigPicture();
 };
 
 const chargeMiniatures = () => {
