@@ -20,4 +20,6 @@ const renderPhotoMiniatures = (photosData) => {
   picturesSection.append(photoMiniaturesFragment);
 };
 
+renderPhotoMiniatures(photosDataArray);
+
 export { photosDataArray, renderPhotoMiniatures };

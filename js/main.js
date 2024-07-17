@@ -1,2 +1,1 @@
-import { photosDataArray, renderPhotoMiniatures } from './photo-miniatures.js';
-renderPhotoMiniatures(photosDataArray);
+import './image-fullsize-mode.js';
