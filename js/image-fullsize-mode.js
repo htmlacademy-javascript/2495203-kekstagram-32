@@ -1,5 +1,3 @@
-import { photosDataArray } from './photo-miniatures.js';
-
 const bigPictureSection = document.querySelector('.big-picture');
 const bigPictureImgElement = bigPictureSection.querySelector('.big-picture__img img');
 const likesCountElement = bigPictureSection.querySelector('.likes-count');
@@ -29,15 +27,18 @@ const renderComments = (commentsData) => {
   commentsListElement.append(commentsListFragment);
 };
 
-const toggleBigPicture = () => {
-  bigPictureSection.classList.toggle('hidden');
-  commentCountElement.classList.toggle('hidden');
-  commentsLoaderElement.classList.toggle('hidden');
-  document.body.classList.toggle('modal-open');
+const showBigPicture = () => {
+  bigPictureSection.classList.remove('hidden');
+  commentCountElement.classList.add('hidden');
+  commentsLoaderElement.classList.add('hidden');
+  document.body.classList.add('modal-open');
 };
 
-const closePopup = () => {
-  toggleBigPicture();
+const hideBigPicture = () => {
+  bigPictureSection.classList.add('hidden');
+  commentCountElement.classList.remove('hidden');
+  commentsLoaderElement.classList.remove('hidden');
+  document.body.classList.remove('modal-open');
 
   bigPictureImgElement.src = '';
   likesCountElement.textContent = '';
@@ -49,42 +50,39 @@ const closePopup = () => {
   bigPictureCloseButton.removeEventListener('click', onCrossClick);
 };
 
-const onMiniatureClick = (evt) => {
-  const miniaturesArray = Array.from(document.querySelectorAll('.picture__img'));
-  const targetElementIndex = miniaturesArray.indexOf(evt.target);
-  const { url, description, likes, comments } = photosDataArray[targetElementIndex];
+const onMiniatureClick = (photosData) => {
 
-  bigPictureImgElement.src = url;
-  likesCountElement.textContent = likes;
-  shownCommentsCountElement.textContent = comments.length;
-  commentsTotalCountElement.textContent = comments.length;
-  captionElement.textContent = description;
-  renderComments(comments);
-  toggleBigPicture();
-
-  bigPictureCloseButton.addEventListener('click', onCrossClick);
-  document.addEventListener('keydown', onDocumentKeyDown);
-};
-
-const chargeMiniatures = () => {
-  const miniaturesContainer = document.querySelector('.pictures');
-  miniaturesContainer.addEventListener('click', (evt) => {
+  const miniaturesListElement = document.querySelector('.pictures');
+  miniaturesListElement.addEventListener('click', (evt) => {
     if (evt.target.matches('.picture__img')) {
-      onMiniatureClick(evt);
+      const miniaturesArray = Array.from(document.querySelectorAll('.picture__img'));
+      const targetElementIndex = miniaturesArray.indexOf(evt.target);
+      const targetPhotoData = photosData[targetElementIndex];
+
+      bigPictureImgElement.src = targetPhotoData.url;
+      likesCountElement.textContent = targetPhotoData.likes;
+      shownCommentsCountElement.textContent = targetPhotoData.comments.length;
+      commentsTotalCountElement.textContent = targetPhotoData.comments.length;
+      captionElement.textContent = targetPhotoData.description;
+      renderComments(targetPhotoData.comments);
+      showBigPicture();
+
+      bigPictureCloseButton.addEventListener('click', onCrossClick);
+      document.addEventListener('keydown', onDocumentKeyDown);
     }
   });
 };
 
 function onCrossClick () {
-  closePopup();
+  hideBigPicture();
 }
 
 function onDocumentKeyDown (evt) {
   if (evt.key === 'Escape') {
     if (!bigPictureSection.classList.contains('hidden')) {
-      closePopup();
+      hideBigPicture();
     }
   }
 }
 
-chargeMiniatures();
+export { onMiniatureClick };
