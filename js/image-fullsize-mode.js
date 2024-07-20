@@ -12,6 +12,19 @@ const commentElement = bigPictureSection.querySelector('.social__comment');
 const commentsToLoadAmount = 5;
 const commentsCollection = commentsListElement.children;
 
+const createFirstComments = (lowerCommentIndex, upperCommentIndex, commentsData) => {
+  for (let i = lowerCommentIndex; i < upperCommentIndex; i++) {
+    const { avatar, message, name } = commentsData[i];
+    const newCommentElement = commentElement.cloneNode(true);
+    const commentImageElement = newCommentElement.querySelector('.social__picture');
+    const commentTextElement = newCommentElement.querySelector('.social__text');
+
+    commentImageElement.src = avatar;
+    commentImageElement.alt = name;
+    commentTextElement.textContent = message;
+    commentsListElement.append(newCommentElement);
+  }
+};
 
 const renderComments = (commentsData) => {
   commentsTotalCountElement.textContent = commentsData.length;
@@ -21,32 +34,12 @@ const renderComments = (commentsData) => {
     shownCommentsCountElement.textContent = commentsData.length;
   } else if (commentsData.length <= commentsToLoadAmount) {
 
-    for (let i = 0; i < commentsData.length; i++) {
-      const { avatar, message, name } = commentsData[i];
-      const newCommentElement = commentElement.cloneNode(true);
-      const commentImageElement = newCommentElement.querySelector('.social__picture');
-      const commentTextElement = newCommentElement.querySelector('.social__text');
-
-      commentImageElement.src = avatar;
-      commentImageElement.alt = name;
-      commentTextElement.textContent = message;
-      commentsListElement.append(newCommentElement);
-    }
+    createFirstComments(0, commentsData.length, commentsData);
     shownCommentsCountElement.textContent = commentsData.length;
     commentsLoaderElement.classList.add('hidden');
   } else {
 
-    for (let i = 0; i < commentsToLoadAmount; i++) {
-      const { avatar, message, name } = commentsData[i];
-      const newCommentElement = commentElement.cloneNode(true);
-      const commentImageElement = newCommentElement.querySelector('.social__picture');
-      const commentTextElement = newCommentElement.querySelector('.social__text');
-
-      commentImageElement.src = avatar;
-      commentImageElement.alt = name;
-      commentTextElement.textContent = message;
-      commentsListElement.append(newCommentElement);
-    }
+    createFirstComments(0, commentsToLoadAmount, commentsData);
     const newShownCommentsAmount = commentsCollection.length;
     shownCommentsCountElement.textContent = newShownCommentsAmount;
 
