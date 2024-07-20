@@ -12,8 +12,8 @@ const commentElement = bigPictureSection.querySelector('.social__comment');
 const commentsToLoadAmount = 5;
 const commentsCollection = commentsListElement.children;
 
-const createFirstComments = (lowerCommentIndex, upperCommentIndex, commentsData) => {
-  for (let i = lowerCommentIndex; i < upperCommentIndex; i++) {
+const createFirstComments = (lowerCommentIndex, firstCommentsAmount, commentsData) => {
+  for (let i = lowerCommentIndex; i < firstCommentsAmount; i++) {
     const { avatar, message, name } = commentsData[i];
     const newCommentElement = commentElement.cloneNode(true);
     const commentImageElement = newCommentElement.querySelector('.social__picture');
