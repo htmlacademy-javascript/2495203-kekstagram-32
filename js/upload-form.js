@@ -102,6 +102,7 @@ const hideEditWindow = () => {
   scaleDowngradeButton.disabled = false;
   scaleUpgradeButton.disabled = false;
   previewImage.removeAttribute('style');
+  effectsLevelInput.setAttribute('value', '');
 
   pristine.reset();
   effectSliderContainer.noUiSlider.destroy();
