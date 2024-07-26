@@ -4,6 +4,43 @@ const SCALE_CHANGING_STEP = 25;
 const COMMENT_MAX_LENGTH = 140;
 const HASHTAG_PATTERN = /^#[a-zа-яё0-9]{1,19}$/i;
 const MAX_HASHTAGS_AMOUNT = 5;
+const FILTERS_DICTIONARY = {
+  chrome: {
+    minValue: 0,
+    maxValue: 1,
+    step: 0.1,
+    filterName: 'grayscale',
+    units: ''
+  },
+  sepia: {
+    minValue: 0,
+    maxValue: 1,
+    step: 0.1,
+    filterName: 'sepia',
+    units: ''
+  },
+  marvin: {
+    minValue: 0,
+    maxValue: 100,
+    step: 1,
+    filterName: 'invert',
+    units: '%'
+  },
+  phobos: {
+    minValue: 0,
+    maxValue: 3,
+    step: 0.1,
+    filterName: 'blur',
+    units: 'px'
+  },
+  heat: {
+    minValue: 1,
+    maxValue: 3,
+    step: 0.1,
+    filterName: 'brightness',
+    units: ''
+  }
+};
 
 
 const uploadInputElement = document.querySelector('.img-upload__input');
@@ -29,18 +66,17 @@ const pristine = new Pristine(uploadForm, {
   errorTextParent: 'img-upload__field-wrapper'
 });
 
-const validateHashtagsFormat = () => {
-  const hashtagValue = hashtagsInput.value;
-  if (hashtagValue === '') {
+const validateHashtagsFormat = (inputValue) => {
+  if (inputValue === '') {
     return true;
   }
-  const hashtagsArray = hashtagValue.split(' ');
+  const hashtagsArray = inputValue.trim().split(' ');
   return hashtagsArray.every((hashtag) => HASHTAG_PATTERN.test(hashtag));
 };
 
-const validateHashtagsUniqueness = () => {
+const validateHashtagsUniqueness = (inputValue) => {
   let isValid = true;
-  const hashtagsArray = hashtagsInput.value.split(' ').map((hashtag) => hashtag.toLowerCase());
+  const hashtagsArray = inputValue.trim().split(' ').map((hashtag) => hashtag.toLowerCase());
   const usedHashtags = [];
   hashtagsArray.forEach((hashtag) => {
     if (usedHashtags.includes(hashtag)) {
@@ -51,12 +87,12 @@ const validateHashtagsUniqueness = () => {
   return isValid;
 };
 
-const validateHashtagsAmount = () => {
-  const hashtagsArray = hashtagsInput.value.split(' ');
+const validateHashtagsAmount = (inputValue) => {
+  const hashtagsArray = inputValue.trim().split(' ');
   return hashtagsArray.length <= MAX_HASHTAGS_AMOUNT;
 };
 
-const validateCommentLength = () => commentTextarea.value.length <= COMMENT_MAX_LENGTH;
+const validateCommentLength = (textareaValue) => textareaValue.trim().length <= COMMENT_MAX_LENGTH;
 
 pristine.addValidator(hashtagsInput, validateHashtagsFormat, 'Неверный формат хэштега', 1, true);
 pristine.addValidator(hashtagsInput, validateHashtagsUniqueness, 'Хэштеги должны быть уникальными', 2, true);
@@ -64,23 +100,22 @@ pristine.addValidator(hashtagsInput, validateHashtagsAmount, 'Должно бы�
 pristine.addValidator(commentTextarea, validateCommentLength, 'Максимальная длина комментария 140 символов');
 
 
-const useFilter = (minValue, maxValue, step, filterName, units) => {
+const applyFilter = (filterOptionsObject) => {
 
   effectLevelContainer.classList.remove('hidden');
 
-  effectSliderContainer.noUiSlider.on('update', () => {
-    const sliderValue = parseFloat(effectSliderContainer.noUiSlider.get(), 1);
-    effectsLevelInput.setAttribute('value', sliderValue);
-    previewImage.style.filter = `${filterName}(${sliderValue}${units})`;
+  effectSliderContainer.noUiSlider.on('update', (sliderValue) => {
+    effectsLevelInput.setAttribute('value', parseFloat(sliderValue, 1));
+    previewImage.style.filter = `${filterOptionsObject.filterName}(${sliderValue}${filterOptionsObject.units})`;
   });
 
   effectSliderContainer.noUiSlider.updateOptions({
     range: {
-      min: minValue,
-      max: maxValue
+      min: filterOptionsObject.minValue,
+      max: filterOptionsObject.maxValue
     },
-    step: step,
-    start: maxValue
+    step: filterOptionsObject.step,
+    start: filterOptionsObject.maxValue
   });
 };
 
@@ -90,9 +125,7 @@ const changeImageScale = (scalePercentage) => {
   previewImage.style.transform = `scale(${cssScalePropertyValue})`;
 };
 
-const hideEditWindow = () => {
-  editWindow.classList.add('hidden');
-  document.body.classList.remove('modal-open');
+const resetEditWindow = () => {
   uploadForm.reset();
   // previewImage.src = '';
   // effectsPreviewElements.forEach((previewElement) => {
@@ -103,20 +136,16 @@ const hideEditWindow = () => {
   scaleUpgradeButton.disabled = false;
   previewImage.removeAttribute('style');
   effectsLevelInput.setAttribute('value', '');
+};
 
+const hideEditWindow = () => {
+  editWindow.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+  resetEditWindow();
   pristine.reset();
   effectSliderContainer.noUiSlider.destroy();
 
-  editWindowCloseButton.removeEventListener('click', onCrossButtonClick);
   document.removeEventListener('keydown', onDocumentKeydown);
-  scaleDowngradeButton.removeEventListener('click', onScaleControllersClick);
-  scaleUpgradeButton.removeEventListener('click', onScaleControllersClick);
-  effectsContainer.removeEventListener('change', onEffectChange);
-  uploadForm.removeEventListener('submit', onFormSubmit);
-  commentTextarea.removeEventListener('focus', onCommentTextareaFocus);
-  commentTextarea.removeEventListener('keydown', onEditFieldsKeydown);
-  hashtagsInput.addEventListener('focus', onHashtagsInputFocus);
-  hashtagsInput.removeEventListener('keydown', onEditFieldsKeydown);
 };
 
 const showEditWindow = () => {
@@ -129,7 +158,6 @@ const showEditWindow = () => {
   // });
 
   scaleUpgradeButton.disabled = true;
-
   effectLevelContainer.classList.add('hidden');
   noUiSlider.create(effectSliderContainer, {
     range: {
@@ -140,14 +168,7 @@ const showEditWindow = () => {
     start: 0
   });
 
-  editWindowCloseButton.addEventListener('click', onCrossButtonClick);
   document.addEventListener('keydown', onDocumentKeydown);
-  scaleDowngradeButton.addEventListener('click', onScaleControllersClick);
-  scaleUpgradeButton.addEventListener('click', onScaleControllersClick);
-  effectsContainer.addEventListener('change', onEffectChange);
-  uploadForm.addEventListener('submit', onFormSubmit);
-  commentTextarea.addEventListener('focus', onCommentTextareaFocus);
-  hashtagsInput.addEventListener('focus', onHashtagsInputFocus);
 };
 
 const onUploadInputChange = () => {
@@ -194,32 +215,15 @@ function onScaleControllersClick(evt) {
 function onEffectChange(evt) {
 
   if (evt.target.matches('.effects__radio')) {
-    switch (evt.target.value) {
-      case 'none':
-        previewImage.style.filter = '';
-        effectLevelContainer.classList.add('hidden');
-        break;
-
-      case 'chrome':
-        useFilter(0, 1, 0.1, 'grayscale', '');
-        break;
-
-      case 'sepia':
-        useFilter(0, 1, 0.1, 'sepia', '');
-        break;
-
-      case 'marvin':
-        useFilter(0, 100, 1, 'invert', '%');
-        break;
-
-      case 'phobos':
-        useFilter(0, 3, 0.1, 'blur', 'px');
-        break;
-
-      case 'heat':
-        useFilter(1, 3, 0.1, 'brightness', '');
-        break;
+    const choosenEffectValue = evt.target.value;
+    if (choosenEffectValue === 'none') {
+      previewImage.style.filter = '';
+      effectLevelContainer.classList.add('hidden');
+      effectsLevelInput.setAttribute('value', '');
+      return;
     }
+
+    applyFilter(FILTERS_DICTIONARY[choosenEffectValue]);
   }
 }
 
@@ -241,5 +245,13 @@ function onCommentTextareaFocus() {
 function onHashtagsInputFocus() {
   hashtagsInput.addEventListener('keydown', onEditFieldsKeydown);
 }
+
+editWindowCloseButton.addEventListener('click', onCrossButtonClick);
+scaleDowngradeButton.addEventListener('click', onScaleControllersClick);
+scaleUpgradeButton.addEventListener('click', onScaleControllersClick);
+effectsContainer.addEventListener('change', onEffectChange);
+uploadForm.addEventListener('submit', onFormSubmit);
+commentTextarea.addEventListener('focus', onCommentTextareaFocus);
+hashtagsInput.addEventListener('focus', onHashtagsInputFocus);
 
 uploadInputElement.addEventListener('change', onUploadInputChange);
