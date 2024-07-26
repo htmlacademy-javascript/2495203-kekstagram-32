@@ -42,7 +42,6 @@ const FILTERS_DICTIONARY = {
   }
 };
 
-
 const uploadInputElement = document.querySelector('.img-upload__input');
 const editWindow = document.querySelector('.img-upload__overlay');
 const uploadForm = document.querySelector('.img-upload__form');
