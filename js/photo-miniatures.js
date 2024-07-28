@@ -1,7 +1,3 @@
-import { generatePhotosArray } from './mock-data.js';
-
-const photosDataArray = generatePhotosArray();
-
 const renderPhotoMiniatures = (photosData) => {
   const photoMiniatureTemplate = document.querySelector('#picture').content;
   const photoMiniaturesFragment = document.createDocumentFragment();
@@ -20,4 +16,4 @@ const renderPhotoMiniatures = (photosData) => {
   picturesSection.append(photoMiniaturesFragment);
 };
 
-export { photosDataArray, renderPhotoMiniatures };
+export { renderPhotoMiniatures };

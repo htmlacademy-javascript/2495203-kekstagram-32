@@ -47,7 +47,8 @@ const editWindow = document.querySelector('.img-upload__overlay');
 const uploadForm = document.querySelector('.img-upload__form');
 const editWindowCloseButton = editWindow.querySelector('.img-upload__cancel');
 const previewImage = document.querySelector('.img-upload__preview img');
-// const effectsPreviewElements = document.querySelectorAll('.effects__preview');
+const uploadFormSubmitButton = document.querySelector('.img-upload__submit');
+const effectsPreviewElements = document.querySelectorAll('.effects__preview');
 const effectLevelContainer = document.querySelector('.img-upload__effect-level');
 const effectsLevelInput = document.querySelector('.effect-level__value');
 const effectSliderContainer = document.querySelector('.effect-level__slider');
@@ -126,10 +127,10 @@ const changeImageScale = (scalePercentage) => {
 
 const resetEditWindow = () => {
   uploadForm.reset();
-  // previewImage.src = '';
-  // effectsPreviewElements.forEach((previewElement) => {
-  //   previewElement.style.backgroundImage = '';
-  // });
+  previewImage.src = '';
+  effectsPreviewElements.forEach((previewElement) => {
+    previewElement.style.backgroundImage = '';
+  });
   scaleInput.setAttribute('value', '100%');
   scaleDowngradeButton.disabled = false;
   scaleUpgradeButton.disabled = false;
@@ -148,13 +149,13 @@ const hideEditWindow = () => {
 };
 
 const showEditWindow = () => {
-  // const uploadingImagePath = uploadInputElement.value;
+  const uploadingImagePath = uploadInputElement.value;
   editWindow.classList.remove('hidden');
   document.body.classList.add('modal-open');
-  // previewImage.src = uploadingImagePath;
-  // effectsPreviewElements.forEach((previewElement) => {
-  //   previewElement.style.backgroundImage = `url(${uploadingImagePath})`;
-  // });
+  previewImage.src = uploadingImagePath;
+  effectsPreviewElements.forEach((previewElement) => {
+    previewElement.style.backgroundImage = `url(${uploadingImagePath})`;
+  });
 
   scaleUpgradeButton.disabled = true;
   effectLevelContainer.classList.add('hidden');
@@ -176,9 +177,18 @@ const onUploadInputChange = () => {
 
 function onDocumentKeydown(evt) {
   if (evt.key === 'Escape') {
+    const successMessage = document.querySelector('.success');
+    const errorMessage = document.querySelector('.error');
     evt.preventDefault();
+    if (errorMessage) {
+      closeErrorMessage();
+      return;
+    }
     if (!editWindow.classList.contains('hidden')) {
       hideEditWindow();
+    }
+    if (successMessage) {
+      closeSuccessMessage();
     }
   }
 }
@@ -228,7 +238,32 @@ function onEffectChange(evt) {
 
 function onFormSubmit(evt) {
   evt.preventDefault();
-  pristine.validate();
+  const isFormValid = pristine.validate();
+
+  if (isFormValid) {
+
+    fetch('https://32.javascript.htmlacademy.pro/kekstagram', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      body: new FormData(uploadForm)
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error();
+        }
+        onFormSubmitSuccess();
+      })
+      .catch(() => {
+        onFormSubmitError();
+      })
+      .finally(() => {
+        uploadFormSubmitButton.disabled = false;
+      });
+
+    uploadFormSubmitButton.disabled = true;
+  }
 }
 
 function onEditFieldsKeydown(evt) {
@@ -245,6 +280,69 @@ function onHashtagsInputFocus() {
   hashtagsInput.addEventListener('keydown', onEditFieldsKeydown);
 }
 
+const openSuccessMessage = () => {
+  const submitSuccessMessageTemplate = document.querySelector('#success').content.cloneNode(true);
+  document.body.append(submitSuccessMessageTemplate);
+};
+
+function closeSuccessMessage() {
+  const submitSuccesMessageElement = document.querySelector('.success');
+  submitSuccesMessageElement.remove();
+
+  document.removeEventListener('keydown', onDocumentKeydown);
+}
+
+function onSuccessButtonClick() {
+  closeSuccessMessage();
+}
+
+function onSuccessMessageOverlayClick(evt) {
+  if (evt.target.matches('.success')) {
+    closeSuccessMessage();
+  }
+}
+
+function onFormSubmitSuccess() {
+  hideEditWindow();
+  openSuccessMessage();
+  const successButton = document.querySelector('.success__button');
+  const successMessageOverlay = document.querySelector('.success');
+
+  successMessageOverlay.addEventListener('click', onSuccessMessageOverlayClick);
+  document.addEventListener('keydown', onDocumentKeydown);
+  successButton.addEventListener('click', onSuccessButtonClick);
+}
+
+function closeErrorMessage() {
+  const errorMessage = document.querySelector('.error');
+  errorMessage.remove();
+}
+
+const openErrorMessage = () => {
+  const errorMessageTemplateClone = document.querySelector('#error').content.cloneNode(true);
+  document.body.append(errorMessageTemplateClone);
+};
+
+function onErrorButtonClick() {
+  closeErrorMessage();
+}
+
+function onErrorOverlayClick(evt) {
+  if (evt.target.matches('.error')) {
+    closeErrorMessage();
+  }
+}
+
+function onFormSubmitError() {
+  openErrorMessage();
+  const errorButton = document.querySelector('.error__button');
+  const errorMessageOverlay = document.querySelector('.error');
+
+  errorButton.addEventListener('click', onErrorButtonClick);
+  errorMessageOverlay.addEventListener('click', onErrorOverlayClick);
+  document.addEventListener('keydown', onDocumentKeydown);
+}
+
 editWindowCloseButton.addEventListener('click', onCrossButtonClick);
 scaleDowngradeButton.addEventListener('click', onScaleControllersClick);
 scaleUpgradeButton.addEventListener('click', onScaleControllersClick);
@@ -252,5 +350,4 @@ effectsContainer.addEventListener('change', onEffectChange);
 uploadForm.addEventListener('submit', onFormSubmit);
 commentTextarea.addEventListener('focus', onCommentTextareaFocus);
 hashtagsInput.addEventListener('focus', onHashtagsInputFocus);
-
 uploadInputElement.addEventListener('change', onUploadInputChange);

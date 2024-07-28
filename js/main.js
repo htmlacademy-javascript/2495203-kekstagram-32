@@ -1,6 +1,5 @@
-import { onMiniatureClick } from './image-fullsize-mode.js';
-import { photosDataArray, renderPhotoMiniatures } from './photo-miniatures.js';
+import { downloadData, onDataDownloadingError } from './data-downloading.js';
 import './upload-form.js';
+import { createPhotoGallery } from './photo-gallery.js';
 
-renderPhotoMiniatures(photosDataArray);
-onMiniatureClick(photosDataArray);
+downloadData(createPhotoGallery, onDataDownloadingError);
