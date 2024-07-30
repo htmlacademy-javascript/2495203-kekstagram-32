@@ -1,5 +1,5 @@
-import { downloadData, onDataDownloadingError } from './data-downloading.js';
+import { getPhotosData } from './api.js';
 import './upload-form.js';
-import { createPhotoGallery } from './photo-gallery.js';
+import { createPhotoGallery, onPhotosGettingError } from './photo-gallery.js';
 
-downloadData(createPhotoGallery, onDataDownloadingError);
+getPhotosData(createPhotoGallery, onPhotosGettingError);

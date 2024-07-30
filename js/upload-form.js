@@ -1,3 +1,5 @@
+import { uploadPhoto } from './api.js';
+
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
 const SCALE_CHANGING_STEP = 25;
@@ -149,7 +151,9 @@ const hideEditWindow = () => {
 };
 
 const showEditWindow = () => {
-  const uploadingImagePath = uploadInputElement.value;
+  const uploadingImage = uploadInputElement.files[0];
+  const uploadingImagePath = URL.createObjectURL(uploadingImage);
+
   editWindow.classList.remove('hidden');
   document.body.classList.add('modal-open');
   previewImage.src = uploadingImagePath;
@@ -173,6 +177,14 @@ const showEditWindow = () => {
 
 const onUploadInputChange = () => {
   showEditWindow();
+};
+
+const disableSubmitButton = () => {
+  uploadFormSubmitButton.disabled = true;
+};
+
+const enableSubmitButton = () => {
+  uploadFormSubmitButton.disabled = false;
 };
 
 function onDocumentKeydown(evt) {
@@ -239,30 +251,10 @@ function onEffectChange(evt) {
 function onFormSubmit(evt) {
   evt.preventDefault();
   const isFormValid = pristine.validate();
+  const uploadingData = new FormData(evt.target);
 
   if (isFormValid) {
-
-    fetch('https://32.javascript.htmlacademy.pro/kekstagram', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      },
-      body: new FormData(uploadForm)
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error();
-        }
-        onFormSubmitSuccess();
-      })
-      .catch(() => {
-        onFormSubmitError();
-      })
-      .finally(() => {
-        uploadFormSubmitButton.disabled = false;
-      });
-
-    uploadFormSubmitButton.disabled = true;
+    uploadPhoto(onFormSubmitSuccess, onFormSubmitError, uploadingData, disableSubmitButton, enableSubmitButton);
   }
 }
 
@@ -302,17 +294,6 @@ function onSuccessMessageOverlayClick(evt) {
   }
 }
 
-function onFormSubmitSuccess() {
-  hideEditWindow();
-  openSuccessMessage();
-  const successButton = document.querySelector('.success__button');
-  const successMessageOverlay = document.querySelector('.success');
-
-  successMessageOverlay.addEventListener('click', onSuccessMessageOverlayClick);
-  document.addEventListener('keydown', onDocumentKeydown);
-  successButton.addEventListener('click', onSuccessButtonClick);
-}
-
 function closeErrorMessage() {
   const errorMessage = document.querySelector('.error');
   errorMessage.remove();
@@ -341,6 +322,17 @@ function onFormSubmitError() {
   errorButton.addEventListener('click', onErrorButtonClick);
   errorMessageOverlay.addEventListener('click', onErrorOverlayClick);
   document.addEventListener('keydown', onDocumentKeydown);
+}
+
+function onFormSubmitSuccess() {
+  hideEditWindow();
+  openSuccessMessage();
+  const successButton = document.querySelector('.success__button');
+  const successMessageOverlay = document.querySelector('.success');
+
+  successMessageOverlay.addEventListener('click', onSuccessMessageOverlayClick);
+  document.addEventListener('keydown', onDocumentKeydown);
+  successButton.addEventListener('click', onSuccessButtonClick);
 }
 
 editWindowCloseButton.addEventListener('click', onCrossButtonClick);
