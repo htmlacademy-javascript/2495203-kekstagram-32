@@ -18,4 +18,15 @@ const generateId = () => {
     return lastGeneratedId;
   };
 };
-export { getRandomInteger, getRandomArrayElement, generateId };
+
+function debounce (callback, timeoutDelay) {
+  let timeoutId;
+
+  return (...rest) => {
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+}
+
+export { getRandomInteger, getRandomArrayElement, generateId, debounce };

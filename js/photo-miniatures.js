@@ -1,19 +1,17 @@
+const createMiniatureElement = (photoItem) => `<a href="#" class="picture" data-photo-id="${photoItem.id}">
+                                                <img class="picture__img" src="${photoItem.url}" width="182" height="182" alt="Случайная фотография">
+                                                <p class="picture__info">
+                                                  <span class="picture__comments">${photoItem.comments.length}</span>
+                                                  <span class="picture__likes">${photoItem.likes}</span>
+                                                </p>
+                                              </a>`;
+
 const renderPhotoMiniatures = (photosData) => {
-  const photoMiniatureTemplate = document.querySelector('#picture').content;
-  const photoMiniaturesFragment = document.createDocumentFragment();
   const picturesSection = document.querySelector('.pictures');
 
-  photosData.forEach(({url, description, likes, comments}) => {
-    const miniatureItemLayout = photoMiniatureTemplate.cloneNode(true);
-    const imageElement = miniatureItemLayout.querySelector('.picture__img');
-    imageElement.src = url;
-    imageElement.alt = description;
-    miniatureItemLayout.querySelector('.picture__likes').textContent = likes;
-    miniatureItemLayout.querySelector('.picture__comments').textContent = comments.length;
-    photoMiniaturesFragment.append(miniatureItemLayout);
+  photosData.forEach((photoItem) => {
+    picturesSection.insertAdjacentHTML('beforeend', createMiniatureElement(photoItem));
   });
-
-  picturesSection.append(photoMiniaturesFragment);
 };
 
 export { renderPhotoMiniatures };
