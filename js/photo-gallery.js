@@ -1,9 +1,9 @@
-import { filterPhotos } from './photo-filtration.js';
+import { initializeMiniatures } from './photo-filtration.js';
 
 const ERROR_MESSAGE_TIME = 5000;
 
 const createPhotoGallery = (photosData) => {
-  filterPhotos(photosData);
+  initializeMiniatures(photosData);
 };
 
 const onPhotosGettingError = () => {

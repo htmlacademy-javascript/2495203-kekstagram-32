@@ -7,7 +7,7 @@ const getRandomInteger = (a, b) => {
 
 const getRandomArrayElement = (array) => {
   const randomIndex = getRandomInteger(0, array.length - 1);
-  return [array[randomIndex], randomIndex];
+  return array[randomIndex];
 };
 
 const generateId = () => {

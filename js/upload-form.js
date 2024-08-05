@@ -181,10 +181,12 @@ const onUploadInputChange = () => {
 
 const disableSubmitButton = () => {
   uploadFormSubmitButton.disabled = true;
+  uploadFormSubmitButton.innerText = 'Отправляется...';
 };
 
 const enableSubmitButton = () => {
   uploadFormSubmitButton.disabled = false;
+  uploadFormSubmitButton.innerText = 'Опубликовать';
 };
 
 function onDocumentKeydown(evt) {

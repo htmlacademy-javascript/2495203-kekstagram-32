@@ -11,10 +11,10 @@ const renderRandomPhotos = (photosData) => {
   const filteredPhotosArray = [];
 
   for (let i = 0; i < RANDOM_PHOTOS_AMOUNT; i++) {
-    let randomPhoto = getRandomArrayElement(photosData)[0];
+    let randomPhoto = getRandomArrayElement(photosData);
 
     while (filteredPhotosArray.includes(randomPhoto)) {
-      randomPhoto = getRandomArrayElement(photosData)[0];
+      randomPhoto = getRandomArrayElement(photosData);
     }
     filteredPhotosArray.push(randomPhoto);
   }
@@ -33,52 +33,55 @@ const renderDiscussedPhotos = (photosData) => {
   renderPhotoMiniatures(sortedPhotosArray);
 };
 
-const changeButtonsState = (evt) => {
+const changeButtonsHighlight = (evt) => {
   const activeButton = document.querySelector('.img-filters__button--active');
 
   activeButton.classList.remove('img-filters__button--active');
   evt.target.classList.add('img-filters__button--active');
 };
 
+const clearMiniatures = () => {
+  const existingMiniatures = document.querySelectorAll('.picture');
+  existingMiniatures.forEach((miniature) => {
+    miniature.remove();
+  });
+};
+
 const rerenderMiniatures = (evt, photosData) => {
 
   const clickedButtonId = evt.target.id;
-  const existingMiniatures = document.querySelectorAll('.picture');
-
+  clearMiniatures();
   if (evt.target.matches('.img-filters__button')) {
-
-    existingMiniatures.forEach((miniature) => {
-      miniature.remove();
-    });
     switch (clickedButtonId) {
       case 'filter-default':
-        renderPhotoMiniatures(photosData);
-        break;
+        return renderPhotoMiniatures(photosData);
 
       case 'filter-random':
-        renderRandomPhotos(photosData);
-        break;
+        return renderRandomPhotos(photosData);
 
       case 'filter-discussed':
-        renderDiscussedPhotos(photosData);
-        break;
+        return renderDiscussedPhotos(photosData);
     }
   }
 };
 
-const onFilterButtonsClick = (evt, photosData) => {
-  changeButtonsState(evt);
+const rerenderDebounced = debounce((evt, photosData) => {
   rerenderMiniatures(evt, photosData);
+}, RENDER_TIMEOUT_DELAY);
+
+const onFilterButtonsClick = (evt, photosData) => {
+  changeButtonsHighlight(evt);
+  rerenderDebounced(evt, photosData);
 };
 
-const filterPhotos = (photosData) => {
+const initializeMiniatures = (photosData) => {
   filterButtonsElement.classList.remove('img-filters--inactive');
   renderPhotoMiniatures(photosData);
   onMiniatureClick(photosData);
 
-  filterButtonsElement.addEventListener('click', debounce((evt) => {
+  filterButtonsElement.addEventListener('click', (evt) => {
     onFilterButtonsClick(evt, photosData);
-  }, RENDER_TIMEOUT_DELAY));
+  });
 };
 
-export { filterPhotos };
+export { initializeMiniatures };
