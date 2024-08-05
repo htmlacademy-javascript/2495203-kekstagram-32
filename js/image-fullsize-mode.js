@@ -79,10 +79,11 @@ const onMiniatureClick = (photosData) => {
 
   const miniaturesListElement = document.querySelector('.pictures');
   miniaturesListElement.addEventListener('click', (evt) => {
+
     if (evt.target.matches('.picture__img')) {
-      const miniaturesArray = Array.from(document.querySelectorAll('.picture__img'));
-      const targetElementIndex = miniaturesArray.indexOf(evt.target);
-      const targetPhotoData = photosData[targetElementIndex];
+      const parentElement = evt.target.closest('.picture');
+      const targetElementId = Number(parentElement.dataset.photoId);
+      const targetPhotoData = photosData.find((photoItem) => photoItem.id === targetElementId);
 
       bigPictureImgElement.src = targetPhotoData.url;
       likesCountElement.textContent = targetPhotoData.likes;

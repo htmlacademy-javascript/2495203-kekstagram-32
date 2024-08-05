@@ -1,11 +1,9 @@
-import { onMiniatureClick } from './image-fullsize-mode.js';
-import { renderPhotoMiniatures } from './photo-miniatures.js';
+import { initializeMiniatures } from './photo-filtration.js';
 
 const ERROR_MESSAGE_TIME = 5000;
 
 const createPhotoGallery = (photosData) => {
-  renderPhotoMiniatures(photosData);
-  onMiniatureClick(photosData);
+  initializeMiniatures(photosData);
 };
 
 const onPhotosGettingError = () => {

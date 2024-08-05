@@ -7,7 +7,7 @@ const getRandomInteger = (a, b) => {
 
 const getRandomArrayElement = (array) => {
   const randomIndex = getRandomInteger(0, array.length - 1);
-  return [array[randomIndex], randomIndex];
+  return array[randomIndex];
 };
 
 const generateId = () => {
@@ -18,4 +18,15 @@ const generateId = () => {
     return lastGeneratedId;
   };
 };
-export { getRandomInteger, getRandomArrayElement, generateId };
+
+function debounce (callback, timeoutDelay) {
+  let timeoutId;
+
+  return (...rest) => {
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+}
+
+export { getRandomInteger, getRandomArrayElement, generateId, debounce };
