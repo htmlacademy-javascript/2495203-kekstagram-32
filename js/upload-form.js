@@ -101,7 +101,6 @@ pristine.addValidator(hashtagsInput, validateHashtagsUniqueness, 'Хэштеги
 pristine.addValidator(hashtagsInput, validateHashtagsAmount, 'Должно быть не больше 5 хэштегов', 3, true);
 pristine.addValidator(commentTextarea, validateCommentLength, 'Максимальная длина комментария 140 символов');
 
-
 const applyFilter = (filterOptionsObject) => {
 
   effectLevelContainer.classList.remove('hidden');
