@@ -5,6 +5,7 @@ const MAX_SCALE_VALUE = 100;
 const SCALE_CHANGING_STEP = 25;
 const COMMENT_MAX_LENGTH = 140;
 const HASHTAG_PATTERN = /^#[a-zа-яё0-9]{1,19}$/i;
+const MULTIPLE_SPACES_PATTERN = /\s{2,}/g;
 const MAX_HASHTAGS_AMOUNT = 5;
 const FILTERS_DICTIONARY = {
   chrome: {
@@ -72,13 +73,13 @@ const validateHashtagsFormat = (inputValue) => {
   if (inputValue === '') {
     return true;
   }
-  const hashtagsArray = inputValue.trim().split(' ');
+  const hashtagsArray = inputValue.trim().replaceAll(MULTIPLE_SPACES_PATTERN, ' ').split(' ');
   return hashtagsArray.every((hashtag) => HASHTAG_PATTERN.test(hashtag));
 };
 
 const validateHashtagsUniqueness = (inputValue) => {
   let isValid = true;
-  const hashtagsArray = inputValue.trim().split(' ').map((hashtag) => hashtag.toLowerCase());
+  const hashtagsArray = inputValue.trim().replaceAll(MULTIPLE_SPACES_PATTERN, ' ').split(' ').map((hashtag) => hashtag.toLowerCase());
   const usedHashtags = [];
   hashtagsArray.forEach((hashtag) => {
     if (usedHashtags.includes(hashtag)) {
@@ -90,11 +91,11 @@ const validateHashtagsUniqueness = (inputValue) => {
 };
 
 const validateHashtagsAmount = (inputValue) => {
-  const hashtagsArray = inputValue.trim().split(' ');
+  const hashtagsArray = inputValue.trim().replaceAll(MULTIPLE_SPACES_PATTERN, ' ').split(' ');
   return hashtagsArray.length <= MAX_HASHTAGS_AMOUNT;
 };
 
-const validateCommentLength = (textareaValue) => textareaValue.trim().length <= COMMENT_MAX_LENGTH;
+const validateCommentLength = (textareaValue) => textareaValue.trim().replaceAll(MULTIPLE_SPACES_PATTERN, ' ').length <= COMMENT_MAX_LENGTH;
 
 pristine.addValidator(hashtagsInput, validateHashtagsFormat, 'Неверный формат хэштега', 1, true);
 pristine.addValidator(hashtagsInput, validateHashtagsUniqueness, 'Хэштеги должны быть уникальными', 2, true);
@@ -118,12 +119,6 @@ const applyFilter = (filterOptionsObject) => {
     step: filterOptionsObject.step,
     start: filterOptionsObject.maxValue
   });
-};
-
-const changeImageScale = (scalePercentage) => {
-  const cssScalePropertyValue = scalePercentage / 100;
-  scaleInput.setAttribute('value', `${scalePercentage}%`);
-  previewImage.style.transform = `scale(${cssScalePropertyValue})`;
 };
 
 const resetEditWindow = () => {
@@ -153,12 +148,12 @@ const showEditWindow = () => {
   const uploadingImage = uploadInputElement.files[0];
   const uploadingImagePath = URL.createObjectURL(uploadingImage);
 
-  editWindow.classList.remove('hidden');
-  document.body.classList.add('modal-open');
   previewImage.src = uploadingImagePath;
   effectsPreviewElements.forEach((previewElement) => {
     previewElement.style.backgroundImage = `url(${uploadingImagePath})`;
   });
+  editWindow.classList.remove('hidden');
+  document.body.classList.add('modal-open');
 
   scaleUpgradeButton.disabled = true;
   effectLevelContainer.classList.add('hidden');
@@ -210,27 +205,37 @@ function onCrossButtonClick() {
   hideEditWindow();
 }
 
+const changeImageScale = (scalePercentage) => {
+  const cssScalePropertyValue = scalePercentage / 100;
+  scaleInput.setAttribute('value', `${scalePercentage}%`);
+  previewImage.style.transform = `scale(${cssScalePropertyValue})`;
+};
+
 function onScaleControllersClick(evt) {
   const currentInputValue = parseInt(scaleInput.value, 10);
   let newImagePercentage = currentInputValue;
 
   if (evt.target.matches('.scale__control--smaller')) {
-    scaleUpgradeButton.disabled = false;
-    newImagePercentage = currentInputValue - SCALE_CHANGING_STEP;
-    changeImageScale(newImagePercentage);
+    if (currentInputValue > MIN_SCALE_VALUE) {
+      scaleUpgradeButton.disabled = false;
+      newImagePercentage = currentInputValue - SCALE_CHANGING_STEP;
+      changeImageScale(newImagePercentage);
 
-    if (newImagePercentage === MIN_SCALE_VALUE) {
-      scaleDowngradeButton.disabled = true;
+      if (newImagePercentage <= MIN_SCALE_VALUE) {
+        scaleDowngradeButton.disabled = true;
+      }
     }
     return;
   }
 
-  scaleDowngradeButton.disabled = false;
-  newImagePercentage = currentInputValue + SCALE_CHANGING_STEP;
-  changeImageScale(newImagePercentage);
+  if (currentInputValue < MAX_SCALE_VALUE) {
+    scaleDowngradeButton.disabled = false;
+    newImagePercentage = currentInputValue + SCALE_CHANGING_STEP;
+    changeImageScale(newImagePercentage);
 
-  if (newImagePercentage === MAX_SCALE_VALUE) {
-    scaleUpgradeButton.disabled = true;
+    if (newImagePercentage === MAX_SCALE_VALUE) {
+      scaleUpgradeButton.disabled = true;
+    }
   }
 }
 
@@ -343,4 +348,5 @@ effectsContainer.addEventListener('change', onEffectChange);
 uploadForm.addEventListener('submit', onFormSubmit);
 commentTextarea.addEventListener('focus', onCommentTextareaFocus);
 hashtagsInput.addEventListener('focus', onHashtagsInputFocus);
-uploadInputElement.addEventListener('change', onUploadInputChange);
+
+export { uploadInputElement, onUploadInputChange };
