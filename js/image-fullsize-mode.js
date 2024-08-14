@@ -1,3 +1,5 @@
+import { isEscape } from './utils.js';
+
 const COMMENTS_TO_LOAD_AMOUNT = 5;
 
 const bigPictureSection = document.querySelector('.big-picture');
@@ -103,7 +105,7 @@ function onCrossClick() {
 }
 
 function onDocumentKeyDown(evt) {
-  if (evt.key === 'Escape') {
+  if (isEscape(evt)) {
     evt.preventDefault();
     if (!bigPictureSection.classList.contains('hidden')) {
       hideBigPicture();
