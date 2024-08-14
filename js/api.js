@@ -1,6 +1,6 @@
 
-const getPhotosData = (onSuccess, onError) => {
-  fetch('https://32.javascript.htmlacademy.pro/kekstagram/data')
+const getPhotosData = (route, onSuccess, onError) => {
+  fetch(route)
     .then((response) => response.json())
     .then((data) => {
       onSuccess(data);
@@ -8,10 +8,10 @@ const getPhotosData = (onSuccess, onError) => {
     .catch(() => onError());
 };
 
-const uploadPhoto = (onSuccess, onError, formData, lockSubmitButton, unlockSubmitButton) => {
+const uploadPhoto = (route, onSuccess, onError, formData, lockSubmitButton, unlockSubmitButton) => {
   lockSubmitButton();
 
-  fetch('https://32.javascript.htmlacademy.pro/kekstagram', {
+  fetch(route, {
     method: 'POST',
     body: formData
   })

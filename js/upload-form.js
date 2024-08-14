@@ -1,4 +1,5 @@
 import { uploadPhoto } from './api.js';
+import { isEscape } from './utils.js';
 
 const MIN_SCALE_VALUE = 25;
 const MAX_SCALE_VALUE = 100;
@@ -44,23 +45,24 @@ const FILTERS_DICTIONARY = {
     units: ''
   }
 };
+const UPLOAD_PHOTO_ROUTE = 'https://32.javascript.htmlacademy.pro/kekstagram';
 
-const uploadInputElement = document.querySelector('.img-upload__input');
-const editWindow = document.querySelector('.img-upload__overlay');
 const uploadForm = document.querySelector('.img-upload__form');
+const uploadInputElement = uploadForm.querySelector('.img-upload__input');
+const editWindow = uploadForm.querySelector('.img-upload__overlay');
 const editWindowCloseButton = editWindow.querySelector('.img-upload__cancel');
-const previewImage = document.querySelector('.img-upload__preview img');
-const uploadFormSubmitButton = document.querySelector('.img-upload__submit');
-const effectsPreviewElements = document.querySelectorAll('.effects__preview');
-const effectLevelContainer = document.querySelector('.img-upload__effect-level');
-const effectsLevelInput = document.querySelector('.effect-level__value');
-const effectSliderContainer = document.querySelector('.effect-level__slider');
-const effectsContainer = document.querySelector('.effects');
-const scaleDowngradeButton = document.querySelector('.scale__control--smaller');
-const scaleUpgradeButton = document.querySelector('.scale__control--bigger');
-const scaleInput = document.querySelector('.scale__control--value');
-const hashtagsInput = uploadForm.querySelector('.text__hashtags');
-const commentTextarea = uploadForm.querySelector('.text__description');
+const previewImage = editWindow.querySelector('.img-upload__preview img');
+const uploadFormSubmitButton = editWindow.querySelector('.img-upload__submit');
+const effectsPreviewElements = editWindow.querySelectorAll('.effects__preview');
+const effectLevelContainer = editWindow.querySelector('.img-upload__effect-level');
+const effectsLevelInput = editWindow.querySelector('.effect-level__value');
+const effectSliderContainer = editWindow.querySelector('.effect-level__slider');
+const effectsContainer = editWindow.querySelector('.effects');
+const scaleDowngradeButton = editWindow.querySelector('.scale__control--smaller');
+const scaleUpgradeButton = editWindow.querySelector('.scale__control--bigger');
+const scaleInput = editWindow.querySelector('.scale__control--value');
+const hashtagsInput = editWindow.querySelector('.text__hashtags');
+const commentTextarea = editWindow.querySelector('.text__description');
 
 
 const pristine = new Pristine(uploadForm, {
@@ -184,7 +186,7 @@ const enableSubmitButton = () => {
 };
 
 function onDocumentKeydown(evt) {
-  if (evt.key === 'Escape') {
+  if (isEscape(evt)) {
     const successMessage = document.querySelector('.success');
     const errorMessage = document.querySelector('.error');
     evt.preventDefault();
@@ -260,12 +262,12 @@ function onFormSubmit(evt) {
   const uploadingData = new FormData(evt.target);
 
   if (isFormValid) {
-    uploadPhoto(onFormSubmitSuccess, onFormSubmitError, uploadingData, disableSubmitButton, enableSubmitButton);
+    uploadPhoto(UPLOAD_PHOTO_ROUTE, onFormSubmitSuccess, onFormSubmitError, uploadingData, disableSubmitButton, enableSubmitButton);
   }
 }
 
 function onEditFieldsKeydown(evt) {
-  if (evt.key === 'Escape') {
+  if (isEscape(evt)) {
     evt.stopPropagation();
   }
 }

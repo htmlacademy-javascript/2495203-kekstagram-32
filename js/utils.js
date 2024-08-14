@@ -19,6 +19,8 @@ const generateId = () => {
   };
 };
 
+const isEscape = (evt) => evt.key === 'Escape';
+
 function debounce (callback, timeoutDelay) {
   let timeoutId;
 
@@ -29,4 +31,4 @@ function debounce (callback, timeoutDelay) {
   };
 }
 
-export { getRandomInteger, getRandomArrayElement, generateId, debounce };
+export { getRandomInteger, getRandomArrayElement, generateId, isEscape, debounce };
